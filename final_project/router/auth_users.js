@@ -15,8 +15,33 @@ const authenticatedUser = (username,password)=>{ //returns boolean
 
 //only registered users can login
 regd_users.post("/login", (req,res) => {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+  const username = req.body.username;
+	const password = req.body.password;
+    var userOK = 0; 
+    var pwOK = 0;
+    var message = "";
+    var pushFlag = 0;
+    var returnCode = 200;
+    if (!username) {message = "username empty"; pushFlag = 1; returnCode = 300;}
+    if (!password) {message = "password empty";pushFlag = 1; returnCode = 300;}
+    
+    if(pushFlag === 0)
+    {
+        for (var i in users) {
+           if(users[i].username === username && users[i].password === password){userOK = 1;} 
+        }
+         // Generate JWT access token
+        let accessToken = jwt.sign({
+            data: username, password
+        }, 'access', { expiresIn: 60 * 60 });
+
+         // Store access token in session
+         req.session.authorization = {
+           accessToken
+        }
+        message += accessToken.toString();
+    }
+    return res.status(returnCode).json({message: message});
 });
 
 // Add a book review
