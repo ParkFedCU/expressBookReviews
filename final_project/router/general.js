@@ -17,25 +17,37 @@ public_users.get('/',function (req, res) {
 
 // Get book details based on ISBN
 public_users.get('/isbn/:isbn',function (req, res) {
-    var test = "";
-    const isbn = req.body.isbn;
-    for(const element in books){
-        test += element.isbn;
-  }
-    return res.status(200).json({books: test});     
+    //I assumed the key is the 'isbn'
+    const keyToFind = req.query.isbn;
+    const foundKey = Object.keys(books).find(key => key === keyToFind);
+    return res.status(200).json({book: books[keyToFind]});     
 
  });
   
 // Get book details based on author
 public_users.get('/author/:author',function (req, res) {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+    const author = req.query.author;
+    const keysArray = Object.keys(books);
+    var foundElement = "";
+    keysArray.find(element => {
+        if (books[element].author === author) {
+            foundElement += JSON.stringify(books[element]);
+        }
+    });
+    return res.status(200).json({book: foundElement});     
 });
 
 // Get all books based on title
 public_users.get('/title/:title',function (req, res) {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+    const title = req.query.title;
+    const keysArray = Object.keys(books);
+    var foundElement = "";
+    keysArray.find(element => {
+        if (books[element].title === title) {
+            foundElement += JSON.stringify(books[element]);
+        }
+    });
+    return res.status(200).json({book: foundElement});  
 });
 
 //  Get book review
