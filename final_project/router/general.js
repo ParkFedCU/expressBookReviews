@@ -6,8 +6,22 @@ const public_users = express.Router();
 const theBooks = JSON.stringify(books);
 
 public_users.post("/register", (req,res) => {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+    const username = req.body.username;
+	const password = req.body.password;
+    var message = ""; var pushFlag = 0; var returnCode = 200;
+    var aUser = {username:username,password:password}; 
+    if(!password){pushFlag = 1; message = "password required ";returnCode = 300;}
+    if(!username){pushFlag = 1; message += "username required";returnCode = 300;}   
+    if(pushFlag === 0){
+       for (var i in users) {
+           if(users[i].username === username){message = "User already added";pushFlag = 1;} 
+        }
+        if(pushFlag === 0){
+          users.push(aUser);
+          message = username + " added.";
+        }
+    }
+  return res.status(returnCode).json({message: message});
 });
 
 // Get the book list available in the shop
@@ -52,8 +66,18 @@ public_users.get('/title/:title',function (req, res) {
 
 //  Get book review
 public_users.get('/review/:isbn',function (req, res) {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+    const isbn = Number(req.query.isbn);
+    const keysArray = Object.keys(books);
+    var foundElement = "";
+    keysArray.find(element => {
+        if (Number(books[element].isbn) === isbn) {
+            foundElement += JSON.stringify(books[element].reviews);
+        }
+    });
+    return res.status(200).json({book: foundElement});  
 });
+
+
+
 
 module.exports.general = public_users;
