@@ -24,44 +24,75 @@ public_users.post("/register", (req,res) => {
   return res.status(returnCode).json({message: message});
 });
 
+function getBooksFunction() {
+  return  new Promise((resolve, reject) => {
+    resolve(theBooks); //stringified version of the object
+})
+}
+
 // Get the book list available in the shop
 public_users.get('/',function (req, res) {
-    return res.status(200).json({books: theBooks});
+    getBooksFunction().then((result) => {
+	return res.status(200).json({books: result});
+    })
 });
 
+function getISBNFunction(theKey) {
+  return  new Promise((resolve, reject) => {
+       const foundKey = Object.keys(books).find(key => key === theKey);
+       resolve(books[theKey]);
+    })
+}
 // Get book details based on ISBN
 public_users.get('/isbn/:isbn',function (req, res) {
-    //I assumed the key is the 'isbn'
+    //I assumed the key is the 'isbn' since it wasnt there
+    //I also addded an isbn with the same value to query 
     const keyToFind = req.query.isbn;
-    const foundKey = Object.keys(books).find(key => key === keyToFind);
-    return res.status(200).json({book: books[keyToFind]});     
-
+     getISBNFunction(keyToFind).then((result) => {
+	return res.status(200).json({books: result});
+    })
  });
   
+ function getAuthorFunction(author) {
+    return  new Promise((resolve, reject) => {
+        const keysArray = Object.keys(books);
+        var foundElement = "";
+        keysArray.find(element => {
+            if (books[element].author === author) {
+                foundElement += JSON.stringify(books[element]);
+            }
+        });
+        resolve(foundElement); //stringified version of the object
+  })
+  }
+
 // Get book details based on author
 public_users.get('/author/:author',function (req, res) {
     const author = req.query.author;
-    const keysArray = Object.keys(books);
-    var foundElement = "";
-    keysArray.find(element => {
-        if (books[element].author === author) {
-            foundElement += JSON.stringify(books[element]);
-        }
-    });
-    return res.status(200).json({book: foundElement});     
+    getAuthorFunction(author).then((result) => {
+        return res.status(200).json({books: result});
+        })   
 });
 
+function getTitleFunction(title) {
+    return  new Promise((resolve, reject) => {
+        const keysArray = Object.keys(books);
+        var foundElement = "";
+        keysArray.find(element => {
+            if (books[element].title === title) {
+                foundElement += JSON.stringify(books[element]);
+            }
+        });
+
+      resolve(foundElement); //stringified version of the object
+  })
+  }
 // Get all books based on title
 public_users.get('/title/:title',function (req, res) {
     const title = req.query.title;
-    const keysArray = Object.keys(books);
-    var foundElement = "";
-    keysArray.find(element => {
-        if (books[element].title === title) {
-            foundElement += JSON.stringify(books[element]);
-        }
-    });
-    return res.status(200).json({book: foundElement});  
+    getTitleFunction(title).then((result) => {
+        return res.status(200).json({books: result});
+        })
 });
 
 //  Get book review
